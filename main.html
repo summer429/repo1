@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECIF Web 平台</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 確保 body 高度為 full screen 且沒有預設 margin */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* 固定 header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10; /* 確保在最上層 */
+        }
+        /* 主內容區域，考慮固定 header 和 footer 的高度 */
+        .main-container {
+            display: flex;
+            flex: 1; /* 讓主容器佔滿剩餘空間 */
+            margin-top: 56px; /* header 的高度 */
+            margin-bottom: 40px; /* footer 的高度 */
+        }
+        /* 固定 sidebar */
+        aside {
+            position: fixed;
+            top: 56px; /* 緊隨 header 之後 */
+            bottom: 40px; /* 位於 footer 之上 */
+            left: 0;
+            width: 240px; /* Sidebar 寬度 */
+            overflow-y: auto; /* 允許滾動 */
+            z-index: 9; /* 位於 header 之下，內容之上 */
+        }
+        /* iframe 容器，佔滿剩餘空間 */
+        .content-area {
+            flex: 1;
+            margin-left: 240px; /* 與 sidebar 寬度相同 */
+            padding: 20px; /* 內距 */
+            overflow-y: auto; /* 允許內容滾動 */
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* 固定 footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px; /* Footer 高度 */
+            z-index: 10; /* 確保在最上層 */
+        }
+
+        /* Sidebar 層級選單樣式 */
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        .sidebar-menu .level-1 > a {
+            display: block;
+            padding: 10px 15px;
+            background-color: #e2e8f0; /* gray-200 */
+            color: #2d3748; /* gray-800 */
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .sidebar-menu .level-1 > a:hover {
+             background-color: #cbd5e0; /* gray-300 */
+        }
+         .sidebar-menu .level-2 {
+            padding-left: 20px;
+            background-color: #f7fafc; /* gray-100 */
+            display: none; /* 預設隱藏第二層選單 */
+        }
+         .sidebar-menu .level-2 li a {
+             display: block;
+             padding: 8px 15px;
+             color: #4a5568; /* gray-600 */
+             cursor: pointer;
+         }
+        .sidebar-menu .level-2 li a:hover {
+             background-color: #edf2f7; /* gray-200 */
+        }
+         .sidebar-menu .level-1.active > .level-2 {
+             display: block; /* 展開時顯示第二層選單 */
+         }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-3 flex justify-between items-center shadow-md">
+        <div>ECIF Web 平台</div>
+        <div class="text-sm">
+            您好～ <span class="font-bold">user123</span> (<span class="italic">使用者名稱</span>) - 所屬單位
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="bg-gray-200 p-4 shadow-lg sidebar-menu">
+            <ul>
+                <li class="level-1">
+                    <a href="#">系統管理</a>
+                    <ul class="level-2">
+                        <li><a href="#" data-page="account_query.html">帳號登入查詢</a></li>
+                        <li><a href="#" data-page="permission_management.html">權限管理</a></li>
+                    </ul>
+                </li>
+                <li class="level-1">
+                    <a href="#">客戶資料查詢</a>
+                    <ul class="level-2">
+                        <li><a href="#" data-page="basic_data_query.html">基本資料查詢</a></li>
+                        <li><a href="#" data-page="customer_history.html">客戶異動歷史</a></li>
+                        <li><a href="#" data-page="address_query.html">共址共號查詢</a></li>
+                        <li><a href="#" data-page="restricted_users.html">限閱戶管理</a></li>
+                    </ul>
+                </li>
+                <li class="level-1">
+                    <a href="#">API通路管理</a>
+                    <ul class="level-2">
+                        <li><a href="#" data-page="api_query.html">API通路查詢</a></li>
+                        <li><a href="#" data-page="api_settings_query.html">API連線設定查詢</a></li>
+                    </ul>
+                </li>
+                <li class="level-1">
+                    <a href="#">報表管理</a>
+                    <ul class="level-2">
+                        <li><a href="#" data-page="update_stats_report.html">客戶資料更新統計報表</a></li>
+                        <li><a href="#" data-page="update_details_report.html">客戶資料更新明細報表</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- iframe 用於載入頁面 -->
+            <iframe id="mainIframe" src="#" frameborder="0"></iframe>
+
+            <!-- 預設載入的最新消息區塊 - 會被 iframe 覆蓋 -->
+            <div id="latestNews" class="mb-8">
+                <h3 class="text-xl font-semibold mb-3">最新消息</h3>
+                <ul>
+                    <li class="mb-2"><a href="#" class="text-blue-600 hover:underline">重要系統更新通知</a></li>
+                    <li class="mb-2"><a href="#" class="text-blue-600 hover:underline">新功能上線公告：客戶資料匯出</a></li>
+                    <li class="mb-2"><a href="#" class="text-blue-600 hover:underline">例行維護時間調整</a></li>
+                    <li class="mb-2"><a href="#" class="text-blue-600 hover:underline">春節服務時間異動</a></li>
+                    <li class="mb-2"><a href="#" class="text-blue-600 hover:underline">API 文件更新</a></li>
+                </ul>
+                <button class="mt-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    【more】
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-700 text-white text-center p-3 text-sm fixed bottom-0 left-0 right-0">
+        Copyright © 2025 ECIF All rights reserved.
+    </footer>
+
+    <script>
+        // Sidebar 展開/收合邏輯
+        document.querySelectorAll('.sidebar-menu .level-1 > a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault(); // 阻止連結的預設行為
+                const parentLi = this.parentElement;
+                const isActive = parentLi.classList.contains('active');
+
+                // 收合所有第一層選單
+                document.querySelectorAll('.sidebar-menu .level-1').forEach(li => {
+                    li.classList.remove('active');
+                });
+
+                // 如果本來是收合的，則展開它
+                if (!isActive) {
+                    parentLi.classList.add('active');
+                }
+            });
+        });
+
+        // 第二層選單點擊載入 iframe
+        document.querySelectorAll('.sidebar-menu .level-2 a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault(); // 阻止連結的預設行為
+                const page = this.getAttribute('data-page');
+                const iframe = document.getElementById('mainIframe');
+                const latestNews = document.getElementById('latestNews');
+
+                if (page) {
+                    iframe.src = page;
+                    iframe.style.display = 'block'; // 顯示 iframe
+                    latestNews.style.display = 'none'; // 隱藏最新消息
+                } else {
+                     // 如果沒有 data-page 屬性，可以設定預設行為或顯示錯誤
+                     console.log('No page specified for this menu item.');
+                }
+            });
+        });
+
+        // 頁面載入完成後，預設顯示最新消息並隱藏 iframe
+        window.addEventListener('load', function() {
+             const iframe = document.getElementById('mainIframe');
+             const latestNews = document.getElementById('latestNews');
+             iframe.style.display = 'none';
+             latestNews.style.display = 'block';
+        });
+
+    </script>
+
+</body>
+</html> 

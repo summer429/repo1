@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示詞(Prompt)範例</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>網頁提示詞(Prompt)範例</h1>
+    <p>點擊下面的按鈕來看看不同類型的提示詞：</p>
+
+    <h2>JavaScript 內建提示</h2>
+
+    <button onclick="showAlert()">顯示警告 (Alert)</button>
+    <button onclick="showConfirm()">顯示確認 (Confirm)</button>
+    <button onclick="showPrompt()">顯示輸入 (Prompt)</button>
+
+    <script>
+        function showAlert() {
+            alert('這是一個警告訊息！');
+        }
+
+        function showConfirm() {
+            const result = confirm('這是一個確認訊息。您確定嗎？');
+            if (result) {
+                alert('您按下了確定。');
+            } else {
+                alert('您按下了取消。');
+            }
+        }
+
+        function showPrompt() {
+            const name = prompt('這是一個輸入提示。請輸入您的名字：');
+            if (name !== null && name !== '') {
+                alert('您輸入的名字是：' + name);
+            } else if (name === '') {
+                 alert('您沒有輸入任何內容。');
+            } else {
+                alert('您按下了取消。');
+            }
+        }
+    </script>
+
+    <h1>網頁提示詞(Prompt)範例</h1>
+    <p>點擊下面的按鈕來看看不同類型的提示詞：</p>
+
+    <h2>Prototype 提示</h2>
+
+    <button onclick="showTextareaContent('login')">登入頁</button>
+    <button onclick="showTextareaContent('main')">首頁</button>
+    <button onclick="showTextareaContent('settings')">客戶基本資料查詢</button>
+
+    <script>
+        function showTextarea() {
+            // 檢查是否已經存在 textarea，避免重複新增
+            if (document.getElementById('myTextarea')) {
+                return; // 如果存在則不做任何事
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.id = 'myTextarea';
+            textarea.rows = 20; // 增加行數以容納更多文字
+            textarea.cols = 80; // 增加列數以容納更多文字
+            textarea.style.display = 'block'; // 讓 textarea 獨佔一行
+            textarea.style.marginTop = '20px';
+            textarea.style.width = '80%'; // 設定寬度為父容器的 80%
+            textarea.style.height = 'auto'; // 高度自動調整
+            textarea.style.boxSizing = 'border-box'; // 讓 padding 和 border 不影響寬度
+            textarea.style.padding = '10px';
+
+            // 設定文字區域的內容
+            textarea.value = `請基於 [首頁框架] 產生一個「基本資料查詢」的 Web Prototype，
+此功能提供客服與分行人員依據客戶 ID 查詢客戶資料，
+畫面需求如下：
+
+1. 查詢條件區塊：
+- 客戶 ID：文字輸入欄位，必填，輸入後按下「查詢」按鈕可發送查詢。
+
+2. 查詢結果區塊：
+- 顯示欄位依登入者權限值動態決定，欄位包括（但不一定全部顯示）：
+  - 客戶姓名（文字）
+  - 出生年月日（日期）
+  - 身分證字號（文字）
+  - 聯絡地址（文字）
+  - 聯絡電話（文字）
+- 請用表格方式呈現資料。
+
+3. 權限與互動規則：
+- 權限值可影響查詢結果欄位呈現，非授權欄位需隱藏或遮罩。
+- 若查詢結果為限閱戶，則顯示提示訊息並記錄查詢行為。
+
+4. UI 設計要求：
+- 請用 HTML + Tailwind CSS 撰寫，兩欄結構。`;
+
+            // 將 textarea 加入到 body 的結尾
+            document.body.appendChild(textarea);
+        }
+
+        // 確保文字區域存在並返回它
+        function ensureTextareaExists() {
+            let textarea = document.getElementById('myTextarea');
+            const linksDiv = document.getElementById('prototypeLinks');
+
+            if (!textarea) {
+                textarea = document.createElement('textarea');
+                textarea.id = 'myTextarea';
+                textarea.rows = 20; // 增加行數以容納更多文字
+                textarea.cols = 80; // 增加列數以容納更多文字
+                textarea.style.display = 'block'; // 讓 textarea 獨佔一行
+                textarea.style.marginTop = '20px';
+                textarea.style.width = '80%'; // 設定寬度為父容器的 80%
+                textarea.style.height = 'auto'; // 高度自動調整
+                textarea.style.boxSizing = 'border-box'; // 讓 padding 和 border 不影響寬度
+                textarea.style.padding = '10px';
+                document.body.appendChild(textarea);
+            }
+
+            // 顯示連結按鈕區域
+            if (linksDiv) {
+                linksDiv.style.display = 'block';
+            }
+
+            return textarea;
+        }
+
+        // 根據傳入的類型顯示不同的文字內容到 textarea
+        function showTextareaContent(type) {
+            const textarea = ensureTextareaExists();
+            let content = '';
+
+            if (type === 'login') {
+                content = `請建立一個簡易的 ECIF Web 登入頁面，需求如下：
+
+【畫面元素設計】
+1. 頁面中心置中顯示一個登入表單。
+2. 表單欄位包含：
+   - 帳號輸入欄位（input[type=text]，預設值：ebiz）
+   - 密碼輸入欄位（input[type=password]，預設值：ebiz）
+   - 登入按鈕（button 顯示文字：「登入」）
+
+【互動邏輯】
+- 當使用者點擊「登入」按鈕：
+   - 若帳號為「ebiz」且密碼為「ebiz」，則顯示「登入成功」訊息（可用 alert 或頁面提示區塊）
+   - 若密碼錯誤，則在表單下方顯示錯誤提示：「帳號或密碼錯誤，請重新輸入」
+
+【UI 設計建議】
+- 使用 Tailwind CSS 美化畫面：
+   - 登入表單置中、白底卡片樣式、圓角、陰影、內距
+   - 輸入欄位與按鈕適度間距與 hover 效果
+- 響應式設計，支援桌機與手機畫面
+
+【補充】
+- 請用 HTML + Tailwind CSS + JavaScript 撰寫（可用純 JS）
+- 表單邏輯可用前端模擬（不需連接後端 API）`;
+            } else if (type === 'main') {
+                 content = `請使用 HTML + JavaScript + Tailwind CSS 多檔案架構，實作 ECIF Web 平台的 main.html 主畫面，內容包含：
+
+🧭 Layout 結構：
+左側選單 (Sidebar)：具有第 1 層與第 2 層選單，支援展開 / 收合功能：
+
+點擊第 1 層選單項目時，展開對應的第 2 層，同時收合其他第 1 層的子選單。
+
+第 2 層選單點擊後，透過 iframe 載入指定頁面。
+
+🧱 選單項目結構如下：
+第 1 層：「系統管理」
+
+第 2 層：「帳號登入查詢」、「權限管理」
+
+第 1 層：「客戶資料查詢」
+
+第 2 層：「基本資料查詢」、「客戶異動歷史」、「共址共號查詢」、「限閱戶管理」
+
+第 1 層：「API通路管理」
+
+第 2 層：「API通路查詢」、「API連線設定查詢」
+
+第 1 層：「報表管理」
+
+第 2 層：「客戶資料更新統計報表」、「客戶資料更新明細報表」
+
+📌 Header：
+固定在上方，顯示下列資訊：
+
+歡迎詞：「您好～」
+
+使用者帳號、使用者名稱、使用者所屬單位（可用假資料表示）
+
+📄 Main Content：
+中央區塊使用 <iframe> 顯示內容，並具備下列功能：
+
+預設載入「最新消息區塊」：
+
+顯示 5 筆最新消息，每筆為可點擊的超連結
+
+下方提供一個【more】按鈕，導向完整最新消息頁面
+
+📥 Footer：
+固定在底部，顯示版權資訊文字，例如：「Copyright © 2025 ECIF All rights reserved.」`;
+            } else if (type === 'settings') {
+                content = `請產生一個「客戶基本資料查詢」的 Web Prototype，
+此功能提供客服與分行人員依據客戶 ID 查詢客戶資料，
+畫面需求如下：
+
+1. 查詢條件區塊：
+- 客戶 ID：文字輸入欄位，必填，輸入後按下「查詢」按鈕可發送查詢。
+
+2. 查詢結果區塊：
+- 顯示欄位依登入者權限值動態決定，欄位包括（但不一定全部顯示）：
+  - 客戶姓名（文字）
+  - 出生年月日（日期）
+  - 身分證字號（文字）
+  - 聯絡地址（文字）
+  - 聯絡電話（文字）
+- 請用表格方式呈現資料。
+
+3. 權限與互動規則：
+- 權限值可影響查詢結果欄位呈現，非授權欄位需隱藏或遮罩。
+- 若查詢結果為限閱戶，則顯示提示訊息並記錄查詢行為。
+
+4. UI 設計要求：
+- 請用 HTML + Tailwind CSS 撰寫，兩欄結構。`;
+            }
+
+            textarea.value = content;
+        }
+
+    </script>
+
+    <div id="prototypeLinks" style="display: none; margin-top: 20px;">
+        <h3 class="text-xl font-semibold mb-3">查看原型頁面</h3>
+        <a href="login.html" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4">登入頁原型</a>
+        <a href="main.html" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">主頁原型</a>
+        <a href="basic_data_query.html" class="inline-block bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">客戶查詢原型</a>
+    </div>
+
+</body>
+</html> 

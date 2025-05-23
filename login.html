@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECIF 登入頁面</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 可以加入一些額外的客製化樣式 */
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+
+    <div class="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">系統登入</h2>
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="account" class="block text-gray-700 text-sm font-bold mb-2">帳號</label>
+                <input type="text" id="account" name="account" value="ebiz" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">密碼</label>
+                <input type="password" id="password" name="password" value="ebiz" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
+                <p id="errorMessage" class="text-red-500 text-xs italic hidden"></p>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                    登入
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表單預設提交
+
+            const account = document.getElementById('account').value;
+            const password = document.getElementById('password').value;
+            const errorMessageElement = document.getElementById('errorMessage');
+
+            // 檢查帳號密碼
+            if (account === 'ebiz' && password === 'ebiz') {
+                alert('登入成功'); // 顯示成功訊息
+                // 實際應用中可能會導向到主頁面
+            } else {
+                errorMessageElement.textContent = '帳號或密碼錯誤，請重新輸入';
+                errorMessageElement.classList.remove('hidden'); // 顯示錯誤訊息
+            }
+        });
+    </script>
+
+</body>
+</html> 
