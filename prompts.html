@@ -16,6 +16,82 @@
             font-size: 1rem;
             cursor: pointer;
         }
+        #mobileAlertTutorial {
+            display: none;
+            max-width: 880px;
+            margin-top: 16px;
+            padding: 16px 18px 8px;
+            border: 1px solid #d0d7de;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+        #mobileAlertTutorial h2 {
+            margin-top: 0;
+        }
+        #mobileAlertTutorial .goal {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        #mobileAlertTutorial .step {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 12px 0;
+        }
+        #mobileAlertTutorial h3 {
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+        }
+        #mobileAlertTutorial ol,
+        #mobileAlertTutorial ul {
+            margin: 8px 0;
+            padding-left: 1.3rem;
+        }
+        #mobileAlertTutorial li {
+            margin: 4px 0;
+        }
+        .path-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .path {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: #fff;
+        }
+        .path h4 {
+            margin: 0 0 8px;
+        }
+        pre.prompt {
+            white-space: pre-wrap;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        button.copy {
+            background: #0f766e;
+            color: #fff;
+            border: 0;
+            border-radius: 6px;
+        }
+        .expect {
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        @media (max-width: 720px) {
+            .path-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -62,6 +138,94 @@
     <button onclick="showTextareaContent('login')">登入頁</button>
     <button onclick="showTextareaContent('main')">首頁</button>
     <button onclick="showTextareaContent('settings')">客戶基本資料查詢</button>
+
+    <h2>手機告警測試</h2>
+    <p>點擊按鈕展開手把手流程：先在手機 App 打開推播，再發派一個會刻意失敗的 Agent 任務，確認雲端或筆電上的告警會立刻推到手機。</p>
+    <button id="mobileAlertBtn" type="button" onclick="showMobileAlertTutorial()">測試手機告警</button>
+
+    <div id="mobileAlertTutorial">
+        <h2>測試手機告警</h2>
+        <p class="goal"><strong>完整路徑：</strong>手機 App 允許通知 → 發派會刻意失敗的 Agent 任務 → Agent 在雲端或筆電跑出告警並結束這一輪 → 手機立刻收到 App 推播。點通知可回到同一個 Agent。</p>
+
+        <div class="step">
+            <h3>步驟 1．手機端 App 設定</h3>
+            <ol>
+                <li>在 iPhone 或 iPad 從 App Store 安裝 Cursor（iOS／iPadOS 26.0 以上）。Android 請用 Chrome 開啟 <a href="https://cursor.com/agents" target="_blank" rel="noopener">cursor.com/agents</a>，再點「Install App」裝成 PWA。</li>
+                <li>用與電腦相同的 Cursor 帳號登入。公司若要求 SSO，就走 SSO。</li>
+                <li>App 第一次詢問通知時按允許。若當時按了稍後，到手機「設定 → 通知 → Cursor」打開「允許通知」，並打開鎖定畫面、通知中心、橫幅與聲音。</li>
+                <li>同一頁打開 Live Activities（鎖定畫面與動態島最多可同時追蹤 8 個 Agent）。</li>
+                <li>關閉勿擾，或把 Cursor 加進允許通知的 App。背景 App 重新整理維持開啟。</li>
+                <li>帳號須為含 Cloud Agents 的方案（Pro、Pro+、Ultra、Teams、Enterprise）。隱私模式請使用 Privacy Mode；Legacy Privacy Mode 無法在手機啟動 Agent。</li>
+                <li>打開 App，確認看得到要測試的儲存庫與分支。Teams 帳號請登入同一個團隊，Agent 清單才會對得上。</li>
+            </ol>
+            <p>送出任務後把 App 切到背景或鎖定螢幕。App 留在前景時，系統通常只更新畫面，橫幅推播會晚一點才出現。</p>
+        </div>
+
+        <div class="step">
+            <h3>步驟 2．選定 Agent 跑在雲端或筆電</h3>
+            <div class="path-grid">
+                <div class="path">
+                    <h4>雲端</h4>
+                    <ol>
+                        <li>在電腦的 Agents 視窗，或開啟 <a href="https://cursor.com/agents" target="_blank" rel="noopener">cursor.com/agents</a>。</li>
+                        <li>輸入框下方選 <strong>Cloud</strong>，指定這個儲存庫與分支。</li>
+                        <li>也可以直接在手機 App 選儲存庫後送出下面的測試任務。雲端機器會繼續跑，手機鎖定也沒關係。</li>
+                    </ol>
+                </div>
+                <div class="path">
+                    <h4>筆電（Remote Control）</h4>
+                    <ol>
+                        <li>電腦安裝 Cursor 3.9.8 或更新版本。</li>
+                        <li>Agents 視窗開啟 <strong>Settings → Agents → Remote Control</strong>。需要的話一併打開「Keep this computer awake」。</li>
+                        <li>Teams／Enterprise 請管理員先到 Dashboard → Cloud Agents → Self-Hosted 啟用 Remote Control。</li>
+                        <li>在本機 Agent 輸入框執行 <code>/remote-control</code>，下一則訊息再貼上步驟 3 的任務。</li>
+                        <li>工具指令跑在這台電腦上，所以電腦要保持開機、聯網、不要睡眠。工作階段會出現在手機收件匣。</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>步驟 3．發派會刻意觸發錯誤的任務</h3>
+            <p>把下面整段貼進 Agent 後送出。它只執行一個必定以 exit code 2 結束的指令，然後立刻停止，讓這一輪以告警狀態結束。Cursor 會在 Agent 結束這一輪時發送推播。</p>
+            <pre class="prompt" id="mobileAlertPrompt">【手機告警測試｜請刻意失敗並立刻結束】
+
+這是一則推播測試，請嚴格只做下面三件事，然後結束這一輪：
+
+1. 在終端機執行這段一定會失敗的指令（不要改寫、不要重跑）：
+   node -e "console.error('MOBILE_ALERT_TEST: intentional failure'); process.exit(2)"
+
+2. 確認行程以 exit code 2 結束。若環境沒有 node，改執行：
+   python3 -c "import sys; sys.stderr.write('MOBILE_ALERT_TEST: intentional failure\n'); sys.exit(2)"
+
+3. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
+   立刻停止，並用下面這段當回覆的第一行：
+
+   【告警】手機推播測試：刻意觸發的指令失敗（exit code 2）
+
+   接著只列出三行：失敗指令、exit code、錯誤訊息原文。</pre>
+            <button class="copy" type="button" onclick="copyMobileAlertPrompt()">複製測試任務</button>
+        </div>
+
+        <div class="step">
+            <h3>步驟 4．確認手機立刻收到推播</h3>
+            <ol>
+                <li>送出後立刻鎖定手機，或把 Cursor App 切到背景。</li>
+                <li>雲端或筆電上的 Agent 跑完那個失敗指令，回覆以「【告警】手機推播測試…」開頭並結束這一輪。</li>
+                <li>鎖定畫面應出現 Cursor 推播；若有 Live Activity，狀態會從進行中變成這一輪已結束。</li>
+                <li>點推播應打開同一個 Agent，內文看得到 exit code 2 與 <code>MOBILE_ALERT_TEST: intentional failure</code>。</li>
+            </ol>
+            <p class="expect"><strong>你應該看到：</strong>Agent 在雲端或筆電跑出告警 → 手機立刻收到 App 推播通知。</p>
+            <p>若鎖定畫面沒有橫幅，依序檢查：</p>
+            <ul>
+                <li>「設定 → 通知 → Cursor」的允許通知、橫幅、鎖定畫面為開啟。</li>
+                <li>這次任務是 Cloud，或已用 <code>/remote-control</code> 交給手機。只留在本機、沒有交出的 Agent 不會進入手機收件匣。</li>
+                <li>手機與電腦是同一個帳號；Teams 要在同一個團隊。</li>
+                <li>電腦在 Remote Control 測試時保持醒著且有網路。</li>
+                <li>打開 App 的收件匣，確認該 Agent 已以告警內容結束。推播對應的是「這一輪結束」。</li>
+            </ul>
+        </div>
+    </div>
 
     <script>
         function showTextarea() {
@@ -236,6 +400,38 @@
             }
 
             textarea.value = content;
+        }
+
+        function showMobileAlertTutorial() {
+            const panel = document.getElementById('mobileAlertTutorial');
+            const opening = panel.style.display !== 'block';
+            panel.style.display = opening ? 'block' : 'none';
+            if (opening) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function copyMobileAlertPrompt() {
+            const text = document.getElementById('mobileAlertPrompt').textContent;
+            const button = document.querySelector('#mobileAlertTutorial button.copy');
+            const done = function () {
+                const original = button.textContent;
+                button.textContent = '已複製，貼給 Agent';
+                setTimeout(function () {
+                    button.textContent = original;
+                }, 1600);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done);
+                return;
+            }
+            const area = document.createElement('textarea');
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand('copy');
+            document.body.removeChild(area);
+            done();
         }
 
     </script>
