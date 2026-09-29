@@ -13,4 +13,4 @@
 
 **實作方式建議：** 在 Cursor Automations 設「Agent 任務失敗就推播」；針對上表各情境，用可驗證的失敗指令或檢查腳本（例如缺檔、斷鏈、預期導向失敗）當觸發，不必等真後端。
 
-若要下一步，我可以直接在 `prompts.html` 加「專案告警情境清單」區塊，或幫你寫一組對應的檢查腳本。
+**手機端顯示驗證（時間戳記）：** 用 `SA/checks/00-mobile-alert-timestamp.js`（每次必失敗、exit 2）。stderr 會輸出 `VERIFY_TOKEN` 與 `TIMESTAMP_TAIPEI`；Agent 回覆第一行寫入同一組時間與代碼後結束這一輪。對照鎖定畫面／通知中心與 Agent 內文，確認是「這一次」推播成功。任務文案見 `prompts.html`「手機告警測試 → 步驟 3B」。
