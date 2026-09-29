@@ -87,6 +87,62 @@
             border-radius: 8px;
             padding: 10px 12px;
         }
+        #projectAlertList {
+            max-width: 1100px;
+            margin-top: 28px;
+            padding-top: 8px;
+        }
+        #projectAlertList .alert-table-wrap {
+            overflow-x: auto;
+            margin: 12px 0 16px;
+        }
+        .alert-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            background: #fff;
+        }
+        .alert-table th,
+        .alert-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .alert-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+        .alert-table tr:hover td {
+            background: #f8fafc;
+        }
+        .priority-high { color: #b91c1c; font-weight: 700; }
+        .priority-mid { color: #c2410c; font-weight: 700; }
+        .priority-low { color: #334155; font-weight: 700; }
+        .status-todo {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .status-done {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        code.path {
+            font-size: 0.82rem;
+            background: #f1f5f9;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
         @media (max-width: 720px) {
             .path-grid {
                 grid-template-columns: 1fr;
@@ -226,6 +282,137 @@
             </ul>
         </div>
     </div>
+
+    <section id="projectAlertList">
+        <h2>專案告警情境清單</h2>
+        <p>依目前 ECIF 原型整理，供 Cursor Agent 任務失敗時推播。各情境規劃一支可驗證的檢查腳本；失敗時寫出情境代碼並以 <code>exit code 2</code> 結束，不必等真後端。第一支已完成，其餘依優先順序逐項補上。</p>
+        <p class="goal"><strong>撰寫順序：</strong>高優先（側欄死連結 → 登入流程斷鏈 → 查詢無真實結果）→ 中（限閱戶、權限遮罩、缺頁回歸）→ 低（靜態資源、Prompt／原型不同步）。下一支要寫：<code class="path">SA/checks/02-login-redirect.js</code></p>
+
+        <div class="alert-table-wrap">
+            <table class="alert-table">
+                <thead>
+                    <tr>
+                        <th>優先</th>
+                        <th>情境</th>
+                        <th>觸發條件（範例）</th>
+                        <th>為什麼值得告警</th>
+                        <th>規劃檢查腳本</th>
+                        <th>腳本要驗什麼</th>
+                        <th>狀態</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="priority-high">高</td>
+                        <td>側欄死連結</td>
+                        <td>Agent 補齊缺頁後，<code>main.html</code> 仍指向不存在的 <code>*.html</code></td>
+                        <td>多數選單目前會 iframe 載入失敗</td>
+                        <td><code class="path">SA/checks/01-sidebar-dead-links.js</code></td>
+                        <td>掃描 <code>main.html</code> 的 <code>data-page</code>，缺檔則失敗</td>
+                        <td><span class="status-done">已撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-high">高</td>
+                        <td>登入流程斷鏈</td>
+                        <td>帳密正確後未導向 <code>main.html</code></td>
+                        <td>原型核心路徑不通</td>
+                        <td><code class="path">SA/checks/02-login-redirect.js</code></td>
+                        <td>成功登入分支沒有 <code>location</code>／<code>href</code> 指向 <code>main.html</code> 則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-high">高</td>
+                        <td>查詢無真實結果</td>
+                        <td>「查詢」仍只 <code>console.log</code>、表格永遠寫死王小明</td>
+                        <td>查詢功能形同未接</td>
+                        <td><code class="path">SA/checks/03-query-not-wired.js</code></td>
+                        <td>submit 只有 log、結果仍硬編碼範例列則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-mid">中</td>
+                        <td>限閱戶未提示</td>
+                        <td>查詢結果為限閱戶卻沒有提示／未記錄行為</td>
+                        <td><code>prompts.html</code> 需求有寫、頁面沒做</td>
+                        <td><code class="path">SA/checks/04-restricted-user-hint.js</code></td>
+                        <td><code>basic_data_query.html</code> 找不到限閱戶提示或紀錄則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-mid">中</td>
+                        <td>權限遮罩失效</td>
+                        <td>非授權欄位（身分證、電話等）未隱藏／遮罩</td>
+                        <td>個資合規風險</td>
+                        <td><code class="path">SA/checks/05-pii-mask.js</code></td>
+                        <td>查詢結果明文輸出身分證／電話且無遮罩邏輯則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-mid">中</td>
+                        <td>缺頁回歸</td>
+                        <td>CI／煙霧測試發現 <code>account_query</code>、<code>customer_history</code>、報表頁等仍 404</td>
+                        <td>側欄規劃了 10 頁、實作只有 1 頁</td>
+                        <td><code class="path">SA/checks/06-missing-pages.js</code></td>
+                        <td>側欄列出的頁面檔案必須都存在，缺一則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-low">低</td>
+                        <td>靜態資源未引用</td>
+                        <td><code>style.css</code> 未被任何 HTML 引用卻被當成已套用</td>
+                        <td>樣式預期與實際不一致</td>
+                        <td><code class="path">SA/checks/07-unused-style-css.js</code></td>
+                        <td>沒有 HTML <code>link</code> 到 <code>style.css</code> 則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                    <tr>
+                        <td class="priority-low">低</td>
+                        <td>Prompt／原型不同步</td>
+                        <td><code>prompts.html</code> 需求與實際頁面欄位不一致</td>
+                        <td>AI 再生成時會走偏</td>
+                        <td><code class="path">SA/checks/08-prompt-prototype-drift.js</code></td>
+                        <td>比對 prompt 必填欄位（如客戶 ID）與查詢頁實際欄位，不一致則失敗</td>
+                        <td><span class="status-todo">待撰寫</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="step">
+            <h3>腳本約定（撰寫時共用）</h3>
+            <ul>
+                <li>目錄：<code class="path">SA/checks/</code>；檔名與上表一一對應。</li>
+                <li>執行環境以 Cloud Agent（Linux）為準，使用 Node，本機也可跑。</li>
+                <li>通過：<code>exit 0</code>。失敗：stderr 先輸出情境代碼（例如 <code>ALERT_01_SIDEBAR_DEAD_LINKS</code>），再 <code>exit 2</code>。</li>
+                <li>只讀檢查，不修改業務檔、不 commit、不開 PR。Agent 任務失敗即可推播。</li>
+                <li>實作方式：Cursor Automations 設「Agent 任務失敗就推播」；逐項補腳本後，把對應檢查指令貼給 Cloud Agent。</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>01 側欄死連結：本機執行、通過、觸發告警</h3>
+            <p>在專案根目錄執行：</p>
+            <pre class="prompt">node SA/checks/01-sidebar-dead-links.js</pre>
+            <p><strong>通過檢核（exit 0）：</strong>為 <code>main.html</code> 每個 <code>data-page</code> 補上對應 HTML 檔（哪怕是空白頁），或拿掉仍指向缺檔的側欄項目。再跑同一指令，stdout 應全是 <code>OK</code>，最後一行 <code>PASS</code>。</p>
+            <p><strong>觸發告警（exit 2）：</strong>維持現況（多數側欄頁不存在），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，手機會收到推播。</p>
+            <pre class="prompt" id="check01AlertPrompt">【專案告警檢查｜01 側欄死連結】
+
+請只做下面三件事，然後結束這一輪：
+
+1. 在專案根目錄執行（不要改寫、不要重跑）：
+   node SA/checks/01-sidebar-dead-links.js
+
+2. 確認行程結束碼。若不是 0，視為檢查失敗。
+
+3. 不要修復、不要補頁、不要修改任何檔案、不要 commit、不要開 pull request。
+   立刻停止。若 exit code 為 2，回覆第一行：
+
+   【告警】側欄死連結：main.html 指向不存在的頁面
+
+   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_01_SIDEBAR_DEAD_LINKS）。</pre>
+            <button class="copy" type="button" onclick="copyCheck01AlertPrompt()">複製 01 告警任務</button>
+        </div>
+    </section>
 
     <script>
         function showTextarea() {
@@ -411,9 +598,8 @@
             }
         }
 
-        function copyMobileAlertPrompt() {
-            const text = document.getElementById('mobileAlertPrompt').textContent;
-            const button = document.querySelector('#mobileAlertTutorial button.copy');
+        function copyTextFromElement(elementId, button) {
+            const text = document.getElementById(elementId).textContent;
             const done = function () {
                 const original = button.textContent;
                 button.textContent = '已複製，貼給 Agent';
@@ -432,6 +618,14 @@
             document.execCommand('copy');
             document.body.removeChild(area);
             done();
+        }
+
+        function copyMobileAlertPrompt() {
+            copyTextFromElement('mobileAlertPrompt', document.querySelector('#mobileAlertTutorial button.copy'));
+        }
+
+        function copyCheck01AlertPrompt() {
+            copyTextFromElement('check01AlertPrompt', document.querySelector('#projectAlertList button.copy'));
         }
 
     </script>
