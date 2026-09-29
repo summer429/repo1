@@ -273,20 +273,23 @@
 
 這是一則推播驗證，請嚴格只做下面四件事，然後結束這一輪：
 
-1. 先更新到最新 main（不要改業務檔）：
+1. 先取出驗證腳本（不要改業務檔）：
    git fetch origin
-   git checkout origin/main -- SA/checks/00-mobile-alert-timestamp.js
-   ls -la SA/checks/00-mobile-alert-timestamp.js
+   git checkout origin/main -- SA/checks/00-mobile-alert-timestamp.js 2>/dev/null \
+     || git checkout origin/cursor/mobile-alert-timestamp-e391 -- SA/checks/00-mobile-alert-timestamp.js 2>/dev/null \
+     || true
+   ls -la SA/checks/00-mobile-alert-timestamp.js 2>/dev/null || echo "SCRIPT_MISSING_USE_FALLBACK"
 
 2. 在專案根目錄執行（不要改寫、不要重跑）：
+   若腳本存在：
    node SA/checks/00-mobile-alert-timestamp.js
+   若腳本不存在或沒有 node，改執行：
+   python3 -c "from datetime import datetime, timezone, timedelta; import sys; now=datetime.now(timezone.utc); taipei=now.astimezone(timezone(timedelta(hours=8))).strftime('%Y/%m/%d %H:%M:%S'); token='MAT-'+str(int(now.timestamp()*1000))[-8:]; sys.stderr.write('ALERT_00_MOBILE_TIMESTAMP\nMOBILE_ALERT_TIMESTAMP_TEST: intentional failure with timestamp\nVERIFY_TOKEN='+token+'\nTIMESTAMP_UTC='+now.isoformat().replace('+00:00','Z')+'\nTIMESTAMP_TAIPEI='+taipei+' (Asia/Taipei)\n'); sys.exit(2)"
 
 3. 確認行程以 exit code 2 結束。從 stderr 讀出：
    - VERIFY_TOKEN（例如 MAT-12345678）
    - TIMESTAMP_TAIPEI（Asia/Taipei）
    - TIMESTAMP_UTC
-   若環境沒有 node，或找不到腳本，改執行：
-   python3 -c "from datetime import datetime, timezone, timedelta; import sys; now=datetime.now(timezone.utc); taipei=now.astimezone(timezone(timedelta(hours=8))).strftime('%Y/%m/%d %H:%M:%S'); token='MAT-'+str(int(now.timestamp()*1000))[-8:]; sys.stderr.write('ALERT_00_MOBILE_TIMESTAMP\nMOBILE_ALERT_TIMESTAMP_TEST: intentional failure with timestamp\nVERIFY_TOKEN='+token+'\nTIMESTAMP_UTC='+now.isoformat().replace('+00:00','Z')+'\nTIMESTAMP_TAIPEI='+taipei+' (Asia/Taipei)\n'); sys.exit(2)"
 
 4. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
    立刻停止。回覆第一行必須是（把實際值填進去，不要用範例字串）：
@@ -294,7 +297,7 @@
    【告警】手機推播驗證｜{TIMESTAMP_TAIPEI}｜代碼 {VERIFY_TOKEN}
 
    接著只列出：失敗指令、exit code、VERIFY_TOKEN、TIMESTAMP_TAIPEI、TIMESTAMP_UTC、stderr 原文（含 ALERT_00_MOBILE_TIMESTAMP）。
-   若是找不到模組（exit 1），先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
+   若連 fallback 都失敗，先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
             <button class="copy" type="button" onclick="copyMobileAlertTimestampPrompt()">複製時間戳記驗證任務</button>
         </div>
 
