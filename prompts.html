@@ -285,8 +285,8 @@
 
     <section id="projectAlertList">
         <h2>專案告警情境清單</h2>
-        <p>依目前 ECIF 原型整理，供 Cursor Agent 任務失敗時推播。各情境規劃一支可驗證的檢查腳本；失敗時寫出情境代碼並以 <code>exit code 2</code> 結束，不必等真後端。第一支已完成，其餘依優先順序逐項補上。</p>
-        <p class="goal"><strong>撰寫順序：</strong>高優先（側欄死連結 → 登入流程斷鏈 → 查詢無真實結果）→ 中（限閱戶、權限遮罩、缺頁回歸）→ 低（靜態資源、Prompt／原型不同步）。下一支要寫：<code class="path">SA/checks/02-login-redirect.js</code></p>
+        <p>依目前 ECIF 原型整理，供 Cursor Agent 任務失敗時推播。各情境規劃一支可驗證的檢查腳本；失敗時寫出情境代碼並以 <code>exit code 2</code> 結束，不必等真後端。01、02 已完成，其餘依優先順序逐項補上。</p>
+        <p class="goal"><strong>撰寫順序：</strong>高優先（側欄死連結 → 登入流程斷鏈 → 查詢無真實結果）→ 中（限閱戶、權限遮罩、缺頁回歸）→ 低（靜態資源、Prompt／原型不同步）。下一支要寫：<code class="path">SA/checks/03-query-not-wired.js</code></p>
 
         <div class="alert-table-wrap">
             <table class="alert-table">
@@ -318,7 +318,7 @@
                         <td>原型核心路徑不通</td>
                         <td><code class="path">SA/checks/02-login-redirect.js</code></td>
                         <td>成功登入分支沒有 <code>location</code>／<code>href</code> 指向 <code>main.html</code> 則失敗</td>
-                        <td><span class="status-todo">待撰寫</span></td>
+                        <td><span class="status-done">已撰寫</span></td>
                     </tr>
                     <tr>
                         <td class="priority-high">高</td>
@@ -411,6 +411,30 @@
 
    接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_01_SIDEBAR_DEAD_LINKS）。</pre>
             <button class="copy" type="button" onclick="copyCheck01AlertPrompt()">複製 01 告警任務</button>
+        </div>
+
+        <div class="step">
+            <h3>02 登入流程斷鏈：本機執行、通過、觸發告警</h3>
+            <p>在專案根目錄執行：</p>
+            <pre class="prompt">node SA/checks/02-login-redirect.js</pre>
+            <p><strong>通過檢核（exit 0）：</strong>在 <code>login.html</code> 成功登入分支（帳密皆為 <code>ebiz</code>）加入導向，例如 <code>location.href = 'main.html';</code>。再跑同一指令，stdout 應有 <code>OK</code> 與最後一行 <code>PASS</code>。</p>
+            <p><strong>觸發告警（exit 2）：</strong>維持現況（成功只 <code>alert</code>、未導向），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，手機會收到推播。</p>
+            <pre class="prompt" id="check02AlertPrompt">【專案告警檢查｜02 登入流程斷鏈】
+
+請只做下面三件事，然後結束這一輪：
+
+1. 在專案根目錄執行（不要改寫、不要重跑）：
+   node SA/checks/02-login-redirect.js
+
+2. 確認行程結束碼。若不是 0，視為檢查失敗。
+
+3. 不要修復、不要改 login.html、不要修改任何檔案、不要 commit、不要開 pull request。
+   立刻停止。若 exit code 為 2，回覆第一行：
+
+   【告警】登入流程斷鏈：帳密正確後未導向 main.html
+
+   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_02_LOGIN_REDIRECT）。</pre>
+            <button class="copy" type="button" onclick="copyCheck02AlertPrompt()">複製 02 告警任務</button>
         </div>
     </section>
 
@@ -625,7 +649,11 @@
         }
 
         function copyCheck01AlertPrompt() {
-            copyTextFromElement('check01AlertPrompt', document.querySelector('#projectAlertList button.copy'));
+            copyTextFromElement('check01AlertPrompt', document.querySelector('button[onclick="copyCheck01AlertPrompt()"]'));
+        }
+
+        function copyCheck02AlertPrompt() {
+            copyTextFromElement('check02AlertPrompt', document.querySelector('button[onclick="copyCheck02AlertPrompt()"]'));
         }
 
     </script>
