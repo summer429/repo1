@@ -196,7 +196,7 @@
     <button onclick="showTextareaContent('settings')">客戶基本資料查詢</button>
 
     <h2>手機告警測試</h2>
-    <p>點擊按鈕展開手把手流程：先在手機 App 打開推播，再發派一個會刻意失敗的 Agent 任務，確認雲端或筆電上的告警會立刻推到手機。</p>
+    <p>點擊按鈕展開手把手流程：先在手機 App 打開推播，再發派會刻意失敗的 Agent 任務。可用基本測試確認有推播，再用「時間戳記驗證」對照這一次的時間與代碼是否出現在手機端。</p>
     <button id="mobileAlertBtn" type="button" onclick="showMobileAlertTutorial()">測試手機告警</button>
 
     <div id="mobileAlertTutorial">
@@ -242,7 +242,7 @@
         </div>
 
         <div class="step">
-            <h3>步驟 3．發派會刻意觸發錯誤的任務</h3>
+            <h3>步驟 3．發派會刻意觸發錯誤的任務（基本測試）</h3>
             <p>把下面整段貼進 Agent 後送出。它只執行一個必定以 exit code 2 結束的指令，然後立刻停止，讓這一輪以告警狀態結束。Cursor 會在 Agent 結束這一輪時發送推播。</p>
             <pre class="prompt" id="mobileAlertPrompt">【手機告警測試｜請刻意失敗並立刻結束】
 
@@ -264,14 +264,52 @@
         </div>
 
         <div class="step">
+            <h3>步驟 3B．第二則驗證：帶時間戳記的告警訊息</h3>
+            <p>若基本測試已通過，再用這則確認「這一次」推播有到手機。腳本每次執行都會產生新的台北時間與驗證代碼；請把回覆第一行的時間與代碼，和鎖定畫面／通知中心、Agent 內文對起來。</p>
+            <p>本機可先預覽輸出（一定 exit 2）：</p>
+            <pre class="prompt">node SA/checks/00-mobile-alert-timestamp.js</pre>
+            <p class="expect"><strong>對照重點：</strong>stderr 會有 <code>VERIFY_TOKEN</code>、<code>TIMESTAMP_TAIPEI</code>；Agent 回覆第一行應含同一組時間與代碼。手機點開同一 Agent，內文也要看得到這兩項。</p>
+            <pre class="prompt" id="mobileAlertTimestampPrompt">【手機告警驗證｜時間戳記｜請刻意失敗並立刻結束】
+
+這是一則推播驗證，請嚴格只做下面四件事，然後結束這一輪：
+
+1. 先取出驗證腳本（不要改業務檔）：
+   git fetch origin
+   git checkout origin/main -- SA/checks/00-mobile-alert-timestamp.js 2>/dev/null \
+     || git checkout origin/cursor/mobile-alert-timestamp-e391 -- SA/checks/00-mobile-alert-timestamp.js 2>/dev/null \
+     || true
+   ls -la SA/checks/00-mobile-alert-timestamp.js 2>/dev/null || echo "SCRIPT_MISSING_USE_FALLBACK"
+
+2. 在專案根目錄執行（不要改寫、不要重跑）：
+   若腳本存在：
+   node SA/checks/00-mobile-alert-timestamp.js
+   若腳本不存在或沒有 node，改執行：
+   python3 -c "from datetime import datetime, timezone, timedelta; import sys; now=datetime.now(timezone.utc); taipei=now.astimezone(timezone(timedelta(hours=8))).strftime('%Y/%m/%d %H:%M:%S'); token='MAT-'+str(int(now.timestamp()*1000))[-8:]; sys.stderr.write('ALERT_00_MOBILE_TIMESTAMP\nMOBILE_ALERT_TIMESTAMP_TEST: intentional failure with timestamp\nVERIFY_TOKEN='+token+'\nTIMESTAMP_UTC='+now.isoformat().replace('+00:00','Z')+'\nTIMESTAMP_TAIPEI='+taipei+' (Asia/Taipei)\n'); sys.exit(2)"
+
+3. 確認行程以 exit code 2 結束。從 stderr 讀出：
+   - VERIFY_TOKEN（例如 MAT-12345678）
+   - TIMESTAMP_TAIPEI（Asia/Taipei）
+   - TIMESTAMP_UTC
+
+4. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
+   立刻停止。回覆第一行必須是（把實際值填進去，不要用範例字串）：
+
+   【告警】手機推播驗證｜{TIMESTAMP_TAIPEI}｜代碼 {VERIFY_TOKEN}
+
+   接著只列出：失敗指令、exit code、VERIFY_TOKEN、TIMESTAMP_TAIPEI、TIMESTAMP_UTC、stderr 原文（含 ALERT_00_MOBILE_TIMESTAMP）。
+   若連 fallback 都失敗，先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
+            <button class="copy" type="button" onclick="copyMobileAlertTimestampPrompt()">複製時間戳記驗證任務</button>
+        </div>
+
+        <div class="step">
             <h3>步驟 4．確認手機立刻收到推播</h3>
             <ol>
                 <li>送出後立刻鎖定手機，或把 Cursor App 切到背景。</li>
-                <li>雲端或筆電上的 Agent 跑完那個失敗指令，回覆以「【告警】手機推播測試…」開頭並結束這一輪。</li>
+                <li>雲端或筆電上的 Agent 跑完那個失敗指令，回覆以「【告警】…」開頭並結束這一輪。</li>
                 <li>鎖定畫面應出現 Cursor 推播；若有 Live Activity，狀態會從進行中變成這一輪已結束。</li>
-                <li>點推播應打開同一個 Agent，內文看得到 exit code 2 與 <code>MOBILE_ALERT_TEST: intentional failure</code>。</li>
+                <li>點推播應打開同一個 Agent。基本測試看 <code>MOBILE_ALERT_TEST: intentional failure</code>；時間戳記驗證還要對到同一組 <code>TIMESTAMP_TAIPEI</code> 與 <code>VERIFY_TOKEN</code>（例如 <code>MAT-…</code>）。</li>
             </ol>
-            <p class="expect"><strong>你應該看到：</strong>Agent 在雲端或筆電跑出告警 → 手機立刻收到 App 推播通知。</p>
+            <p class="expect"><strong>你應該看到：</strong>Agent 在雲端或筆電跑出告警 → 手機立刻收到 App 推播通知。時間戳記驗證時，通知／內文的時間與代碼與 stderr 一致，即可確認是「這一次」成功送到手機。</p>
             <p>若鎖定畫面沒有橫幅，依序檢查：</p>
             <ul>
                 <li>「設定 → 通知 → Cursor」的允許通知、橫幅、鎖定畫面為開啟。</li>
@@ -279,6 +317,7 @@
                 <li>手機與電腦是同一個帳號；Teams 要在同一個團隊。</li>
                 <li>電腦在 Remote Control 測試時保持醒著且有網路。</li>
                 <li>打開 App 的收件匣，確認該 Agent 已以告警內容結束。推播對應的是「這一輪結束」。</li>
+                <li>時間戳記驗證：若手機內文沒有 <code>VERIFY_TOKEN</code>，可能是舊輪次推播；重新複製步驟 3B 任務再送一次，用新代碼對照。</li>
             </ul>
         </div>
     </div>
@@ -659,7 +698,11 @@
         }
 
         function copyMobileAlertPrompt() {
-            copyTextFromElement('mobileAlertPrompt', document.querySelector('#mobileAlertTutorial button.copy'));
+            copyTextFromElement('mobileAlertPrompt', document.querySelector('button[onclick="copyMobileAlertPrompt()"]'));
+        }
+
+        function copyMobileAlertTimestampPrompt() {
+            copyTextFromElement('mobileAlertTimestampPrompt', document.querySelector('button[onclick="copyMobileAlertTimestampPrompt()"]'));
         }
 
         function copyCheck01AlertPrompt() {
