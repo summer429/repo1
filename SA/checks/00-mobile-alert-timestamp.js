@@ -2,8 +2,8 @@
 'use strict';
 
 /**
- * 手機推播驗證腳本：每次執行都刻意以 exit code 2 結束，
- * 並在 stderr 寫出時間戳記與驗證代碼，方便對照鎖定畫面推播與 Agent 回覆。
+ * Slack channel 告警驗證腳本：每次執行都刻意以 exit code 2 結束，
+ * 並在 stderr 寫出時間戳記與驗證代碼，方便對照 Slack 訊息與 Agent 回覆。
  * 這不是業務檢核，沒有 PASS 路徑。
  */
 
@@ -31,7 +31,7 @@ console.error(`TIMESTAMP_UTC=${isoUtc}`);
 console.error(`TIMESTAMP_TAIPEI=${taipei} (Asia/Taipei)`);
 console.error(`EPOCH_MS=${epochMs}`);
 console.error(
-  `請在回覆第一行寫：【告警】手機推播驗證｜${taipei}｜代碼 ${verifyToken}`
+  `請在回覆第一行寫：【告警】Slack 驗證｜${taipei}｜代碼 ${verifyToken}`
 );
 
 process.exit(2);
