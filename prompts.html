@@ -16,7 +16,7 @@
             font-size: 1rem;
             cursor: pointer;
         }
-        #mobileAlertTutorial {
+        #slackAlertTutorial {
             display: none;
             max-width: 880px;
             margin-top: 16px;
@@ -25,32 +25,32 @@
             border-radius: 10px;
             background: #f8fafc;
         }
-        #mobileAlertTutorial h2 {
+        #slackAlertTutorial h2 {
             margin-top: 0;
         }
-        #mobileAlertTutorial .goal {
+        #slackAlertTutorial .goal {
             background: #ecfdf5;
             border: 1px solid #a7f3d0;
             border-radius: 8px;
             padding: 10px 12px;
         }
-        #mobileAlertTutorial .step {
+        #slackAlertTutorial .step {
             background: #fff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 12px 14px;
             margin: 12px 0;
         }
-        #mobileAlertTutorial h3 {
+        #slackAlertTutorial h3 {
             margin: 0 0 8px;
             font-size: 1.05rem;
         }
-        #mobileAlertTutorial ol,
-        #mobileAlertTutorial ul {
+        #slackAlertTutorial ol,
+        #slackAlertTutorial ul {
             margin: 8px 0;
             padding-left: 1.3rem;
         }
-        #mobileAlertTutorial li {
+        #slackAlertTutorial li {
             margin: 4px 0;
         }
         .path-grid {
@@ -195,47 +195,45 @@
     <button onclick="showTextareaContent('main')">首頁</button>
     <button onclick="showTextareaContent('settings')">客戶基本資料查詢</button>
 
-    <h2>手機告警測試</h2>
-    <p>點擊按鈕展開手把手流程：先在手機 App 打開推播，再發派會刻意失敗的 Agent 任務。可用基本測試確認有推播，再用「時間戳記驗證」對照這一次的時間與代碼是否出現在手機端。</p>
-    <button id="mobileAlertBtn" type="button" onclick="showMobileAlertTutorial()">測試手機告警</button>
+    <h2>Slack 告警測試</h2>
+    <p>點擊按鈕展開手把手流程：Slack 已連接後，在 Automations 啟用 <strong>Send to Slack</strong> 並指定 channel，再發派會刻意失敗的 Agent 任務。可用基本測試確認 channel 有訊息，再用「時間戳記驗證」對照這一次的時間與代碼。</p>
+    <button id="slackAlertBtn" type="button" onclick="showSlackAlertTutorial()">測試 Slack 告警</button>
 
-    <div id="mobileAlertTutorial">
-        <h2>測試手機告警</h2>
-        <p class="goal"><strong>完整路徑：</strong>手機 App 允許通知 → 發派會刻意失敗的 Agent 任務 → Agent 在雲端或筆電跑出告警並結束這一輪 → 手機立刻收到 App 推播。點通知可回到同一個 Agent。</p>
+    <div id="slackAlertTutorial">
+        <h2>測試 Slack 告警</h2>
+        <p class="goal"><strong>完整路徑：</strong>Slack 已連接 → Automations 啟用 Send to Slack 並指定 channel（例如 <code>#cursor-alerts</code>）→ 發派會刻意失敗的 Agent 任務 → Agent 結束這一輪並把告警貼到該 channel。在 Slack 對照訊息內容與 Agent 內文。</p>
 
         <div class="step">
-            <h3>步驟 1．手機端 App 設定</h3>
+            <h3>步驟 1．Slack 與 Automations 設定</h3>
             <ol>
-                <li>在 iPhone 或 iPad 從 App Store 安裝 Cursor（iOS／iPadOS 26.0 以上）。Android 請用 Chrome 開啟 <a href="https://cursor.com/agents" target="_blank" rel="noopener">cursor.com/agents</a>，再點「Install App」裝成 PWA。</li>
-                <li>用與電腦相同的 Cursor 帳號登入。公司若要求 SSO，就走 SSO。</li>
-                <li>App 第一次詢問通知時按允許。若當時按了稍後，到手機「設定 → 通知 → Cursor」打開「允許通知」，並打開鎖定畫面、通知中心、橫幅與聲音。</li>
-                <li>同一頁打開 Live Activities（鎖定畫面與動態島最多可同時追蹤 8 個 Agent）。</li>
-                <li>關閉勿擾，或把 Cursor 加進允許通知的 App。背景 App 重新整理維持開啟。</li>
-                <li>帳號須為含 Cloud Agents 的方案（Pro、Pro+、Ultra、Teams、Enterprise）。隱私模式請使用 Privacy Mode；Legacy Privacy Mode 無法在手機啟動 Agent。</li>
-                <li>打開 App，確認看得到要測試的儲存庫與分支。Teams 帳號請登入同一個團隊，Agent 清單才會對得上。</li>
+                <li>確認 Cursor Integrations 已連接 Slack（Dashboard → Integrations）。若尚未安裝，到 <a href="https://cursor.com/dashboard?tab=integrations" target="_blank" rel="noopener">Integrations</a> 完成 Connect。</li>
+                <li>在 Slack 目標 channel（建議公開頻道，例如 <code>#cursor-alerts</code>）執行 <code>/invite @Cursor</code>，讓 Cursor bot 加入。</li>
+                <li>開啟 <a href="https://cursor.com/automations" target="_blank" rel="noopener">cursor.com/automations</a>，新建或編輯既有告警 Automation。</li>
+                <li>工具區啟用 <strong>Send to Slack</strong>，目標選「指定 channel」，填入剛才邀請 bot 的頻道。</li>
+                <li>Repository 指定 <code>summer429/repo1</code>（分支 <code>main</code>）。觸發可用 Webhook（方便重測）或 Scheduled。</li>
+                <li>Prompt 需要求：檢查失敗（exit 2）時，用 Send to Slack 把告警摘要（含情境代碼、<code>VERIFY_TOKEN</code>、執行連結）貼到指定 channel；不要修檔、不要開 PR。</li>
+                <li>Save 並 Activate。若用 Webhook，儲存後複製 webhook URL 與 API key 供重測。</li>
             </ol>
-            <p>送出任務後把 App 切到背景或鎖定螢幕。App 留在前景時，系統通常只更新畫面，橫幅推播會晚一點才出現。</p>
+            <p class="expect"><strong>與手機推播的差異：</strong>告警主路徑改為 Slack channel（可讀全文、可對 token）。手機 App 推播若仍開啟可當輔助，但驗證以 Slack 訊息為準。</p>
         </div>
 
         <div class="step">
-            <h3>步驟 2．選定 Agent 跑在雲端或筆電</h3>
+            <h3>步驟 2．選定 Agent 跑在雲端或 Automation</h3>
             <div class="path-grid">
                 <div class="path">
-                    <h4>雲端</h4>
+                    <h4>Cloud Agent</h4>
                     <ol>
                         <li>在電腦的 Agents 視窗，或開啟 <a href="https://cursor.com/agents" target="_blank" rel="noopener">cursor.com/agents</a>。</li>
                         <li>輸入框下方選 <strong>Cloud</strong>，指定這個儲存庫與分支。</li>
-                        <li>也可以直接在手機 App 選儲存庫後送出下面的測試任務。雲端機器會繼續跑，手機鎖定也沒關係。</li>
+                        <li>貼上步驟 3 的任務；結束後到 Slack channel 確認告警訊息。</li>
                     </ol>
                 </div>
                 <div class="path">
-                    <h4>筆電（Remote Control）</h4>
+                    <h4>Automations</h4>
                     <ol>
-                        <li>電腦安裝 Cursor 3.9.8 或更新版本。</li>
-                        <li>Agents 視窗開啟 <strong>Settings → Agents → Remote Control</strong>。需要的話一併打開「Keep this computer awake」。</li>
-                        <li>Teams／Enterprise 請管理員先到 Dashboard → Cloud Agents → Self-Hosted 啟用 Remote Control。</li>
-                        <li>在本機 Agent 輸入框執行 <code>/remote-control</code>，下一則訊息再貼上步驟 3 的任務。</li>
-                        <li>工具指令跑在這台電腦上，所以電腦要保持開機、聯網、不要睡眠。工作階段會出現在手機收件匣。</li>
+                        <li>在 Automations 頁面對該規則按 Test Run，或 POST webhook。</li>
+                        <li>確認工具已勾選 Send to Slack，且 channel 正確。</li>
+                        <li>跑完後同一 channel 應出現含告警代碼的訊息與 Agent 連結。</li>
                     </ol>
                 </div>
             </div>
@@ -243,35 +241,41 @@
 
         <div class="step">
             <h3>步驟 3．發派會刻意觸發錯誤的任務（基本測試）</h3>
-            <p>把下面整段貼進 Agent 後送出。它只執行一個必定以 exit code 2 結束的指令，然後立刻停止，讓這一輪以告警狀態結束。Cursor 會在 Agent 結束這一輪時發送推播。</p>
-            <pre class="prompt" id="mobileAlertPrompt">【手機告警測試｜請刻意失敗並立刻結束】
+            <p>把下面整段貼進 Agent（或寫進 Automation Prompt）後送出。它只執行一個必定以 exit code 2 結束的指令，然後立刻停止，並把告警送到 Slack channel。</p>
+            <pre class="prompt" id="slackAlertPrompt">【Slack 告警測試｜請刻意失敗並立刻結束】
 
-這是一則推播測試，請嚴格只做下面三件事，然後結束這一輪：
+這是一則 Slack channel 告警測試，請嚴格只做下面四件事，然後結束這一輪：
 
 1. 在終端機執行這段一定會失敗的指令（不要改寫、不要重跑）：
+   node smoke-test.js
+   若沒有 smoke-test.js，改執行：
    node -e "console.error('MOBILE_ALERT_TEST: intentional failure'); process.exit(2)"
 
 2. 確認行程以 exit code 2 結束。若環境沒有 node，改執行：
    python3 -c "import sys; sys.stderr.write('MOBILE_ALERT_TEST: intentional failure\n'); sys.exit(2)"
 
-3. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
+3. 若有 Send to Slack 工具：把告警貼到設定的 channel（例如 #cursor-alerts）。訊息至少包含：
+   【告警】Slack 測試：刻意觸發的指令失敗（exit code 2）
+   失敗指令、exit code、錯誤訊息原文、本次 Agent 連結。
+
+4. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
    立刻停止，並用下面這段當回覆的第一行：
 
-   【告警】手機推播測試：刻意觸發的指令失敗（exit code 2）
+   【告警】Slack 測試：刻意觸發的指令失敗（exit code 2）
 
-   接著只列出三行：失敗指令、exit code、錯誤訊息原文。</pre>
-            <button class="copy" type="button" onclick="copyMobileAlertPrompt()">複製測試任務</button>
+   接著只列出：失敗指令、exit code、錯誤訊息原文、是否已送 Slack。</pre>
+            <button class="copy" type="button" onclick="copySlackAlertPrompt()">複製測試任務</button>
         </div>
 
         <div class="step">
             <h3>步驟 3B．第二則驗證：帶時間戳記的告警訊息</h3>
-            <p>若基本測試已通過，再用這則確認「這一次」推播有到手機。腳本每次執行都會產生新的台北時間與驗證代碼；請把回覆第一行的時間與代碼，和鎖定畫面／通知中心、Agent 內文對起來。</p>
+            <p>若基本測試已通過，再用這則確認「這一次」告警有到 Slack。腳本每次執行都會產生新的台北時間與驗證代碼；請把回覆／Slack 訊息的時間與代碼對起來。</p>
             <p>本機可先預覽輸出（一定 exit 2）：</p>
             <pre class="prompt">node SA/checks/00-mobile-alert-timestamp.js</pre>
-            <p class="expect"><strong>對照重點：</strong>stderr 會有 <code>VERIFY_TOKEN</code>、<code>TIMESTAMP_TAIPEI</code>；Agent 回覆第一行應含同一組時間與代碼。手機點開同一 Agent，內文也要看得到這兩項。</p>
-            <pre class="prompt" id="mobileAlertTimestampPrompt">【手機告警驗證｜時間戳記｜請刻意失敗並立刻結束】
+            <p class="expect"><strong>對照重點：</strong>stderr 會有 <code>VERIFY_TOKEN</code>、<code>TIMESTAMP_TAIPEI</code>；Agent 回覆與 Slack channel 訊息都應含同一組時間與代碼。</p>
+            <pre class="prompt" id="slackAlertTimestampPrompt">【Slack 告警驗證｜時間戳記｜請刻意失敗並立刻結束】
 
-這是一則推播驗證，請嚴格只做下面四件事，然後結束這一輪：
+這是一則 Slack channel 告警驗證，請嚴格只做下面五件事，然後結束這一輪：
 
 1. 先取出驗證腳本（不要改業務檔）：
    git fetch origin
@@ -291,40 +295,40 @@
    - TIMESTAMP_TAIPEI（Asia/Taipei）
    - TIMESTAMP_UTC
 
-4. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
+4. 若有 Send to Slack 工具：把同一組 VERIFY_TOKEN、TIMESTAMP_TAIPEI、stderr 摘要與 Agent 連結貼到設定的 channel（例如 #cursor-alerts）。
+
+5. 不要修復、不要重試、不要修改任何檔案、不要 commit、不要開 pull request。
    立刻停止。回覆第一行必須是（把實際值填進去，不要用範例字串）：
 
-   【告警】手機推播驗證｜{TIMESTAMP_TAIPEI}｜代碼 {VERIFY_TOKEN}
+   【告警】Slack 驗證｜{TIMESTAMP_TAIPEI}｜代碼 {VERIFY_TOKEN}
 
-   接著只列出：失敗指令、exit code、VERIFY_TOKEN、TIMESTAMP_TAIPEI、TIMESTAMP_UTC、stderr 原文（含 ALERT_00_MOBILE_TIMESTAMP）。
+   接著只列出：失敗指令、exit code、VERIFY_TOKEN、TIMESTAMP_TAIPEI、TIMESTAMP_UTC、stderr 原文（含 ALERT_00_MOBILE_TIMESTAMP）、是否已送 Slack。
    若連 fallback 都失敗，先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
-            <button class="copy" type="button" onclick="copyMobileAlertTimestampPrompt()">複製時間戳記驗證任務</button>
+            <button class="copy" type="button" onclick="copySlackAlertTimestampPrompt()">複製時間戳記驗證任務</button>
         </div>
 
         <div class="step">
-            <h3>步驟 4．確認手機立刻收到推播</h3>
+            <h3>步驟 4．確認 Slack channel 收到告警</h3>
             <ol>
-                <li>送出後立刻鎖定手機，或把 Cursor App 切到背景。</li>
-                <li>雲端或筆電上的 Agent 跑完那個失敗指令，回覆以「【告警】…」開頭並結束這一輪。</li>
-                <li>鎖定畫面應出現 Cursor 推播；若有 Live Activity，狀態會從進行中變成這一輪已結束。</li>
-                <li>點推播應打開同一個 Agent。基本測試看 <code>MOBILE_ALERT_TEST: intentional failure</code>；時間戳記驗證還要對到同一組 <code>TIMESTAMP_TAIPEI</code> 與 <code>VERIFY_TOKEN</code>（例如 <code>MAT-…</code>）。</li>
+                <li>送出任務或觸發 Automation 後，打開目標 Slack channel（例如 <code>#cursor-alerts</code>）。</li>
+                <li>Agent／Automation 跑完失敗指令後，回覆以「【告警】…」開頭並結束這一輪。</li>
+                <li>channel 應出現 Cursor bot 訊息；基本測試看 <code>MOBILE_ALERT_TEST: intentional failure</code> 或 <code>ALERT_SMOKE_TEST</code>。</li>
+                <li>時間戳記驗證還要對到同一組 <code>TIMESTAMP_TAIPEI</code> 與 <code>VERIFY_TOKEN</code>（例如 <code>MAT-…</code>）。</li>
             </ol>
-            <p class="expect"><strong>你應該看到：</strong>Agent 在雲端或筆電跑出告警 → 手機立刻收到 App 推播通知。時間戳記驗證時，通知／內文的時間與代碼與 stderr 一致，即可確認是「這一次」成功送到手機。</p>
-            <p>若鎖定畫面沒有橫幅，依序檢查：</p>
+            <p class="expect"><strong>你應該看到：</strong>Agent 跑出告警 → Slack channel 立刻出現含代碼的訊息。時間與代碼與 stderr／Agent 內文一致，即可確認是「這一次」成功送到 Slack。</p>
+            <p>若 channel 沒有訊息，依序檢查：</p>
             <ul>
-                <li>「設定 → 通知 → Cursor」的允許通知、橫幅、鎖定畫面為開啟。</li>
-                <li>這次任務是 Cloud，或已用 <code>/remote-control</code> 交給手機。只留在本機、沒有交出的 Agent 不會進入手機收件匣。</li>
-                <li>手機與電腦是同一個帳號；Teams 要在同一個團隊。</li>
-                <li>電腦在 Remote Control 測試時保持醒著且有網路。</li>
-                <li>打開 App 的收件匣，確認該 Agent 已以告警內容結束。推播對應的是「這一輪結束」。</li>
-                <li>時間戳記驗證：若手機內文沒有 <code>VERIFY_TOKEN</code>，可能是舊輪次推播；重新複製步驟 3B 任務再送一次，用新代碼對照。</li>
+                <li>Automations 是否已 Activate，且工具 <strong>Send to Slack</strong> 已勾選、channel 選對。</li>
+                <li>目標 channel 是否已 <code>/invite @Cursor</code>。</li>
+                <li>Prompt 是否明確要求失敗時呼叫 Send to Slack（僅靠手機推播不會自動進 Slack）。</li>
+                <li>時間戳記驗證：若 Slack 沒有 <code>VERIFY_TOKEN</code>，重新複製步驟 3B 任務再送一次，用新代碼對照。</li>
             </ul>
         </div>
     </div>
 
     <section id="projectAlertList">
         <h2>專案告警情境清單</h2>
-        <p>依目前 ECIF 原型整理，供 Cursor Agent 任務失敗時推播。各情境規劃一支可驗證的檢查腳本；失敗時寫出情境代碼並以 <code>exit code 2</code> 結束，不必等真後端。01、02 已完成，其餘依優先順序逐項補上。</p>
+        <p>依目前 ECIF 原型整理，供 Cursor Agent 任務失敗時以 <strong>Send to Slack</strong> 送到指定 channel。各情境規劃一支可驗證的檢查腳本；失敗時寫出情境代碼並以 <code>exit code 2</code> 結束，不必等真後端。01、02 已完成，其餘依優先順序逐項補上。</p>
         <p class="goal"><strong>撰寫順序：</strong>高優先（側欄死連結 → 登入流程斷鏈 → 查詢無真實結果）→ 中（限閱戶、權限遮罩、缺頁回歸）→ 低（靜態資源、Prompt／原型不同步）。下一支要寫：<code class="path">SA/checks/03-query-not-wired.js</code></p>
 
         <div class="alert-table-wrap">
@@ -423,8 +427,8 @@
                 <li>目錄：<code class="path">SA/checks/</code>；檔名與上表一一對應。</li>
                 <li>執行環境以 Cloud Agent（Linux）為準，使用 Node，本機也可跑。</li>
                 <li>通過：<code>exit 0</code>。失敗：stderr 先輸出情境代碼（例如 <code>ALERT_01_SIDEBAR_DEAD_LINKS</code>），再 <code>exit 2</code>。</li>
-                <li>只讀檢查，不修改業務檔、不 commit、不開 PR。Agent 任務失敗即可推播。</li>
-                <li>實作方式：Cursor Automations 設「Agent 任務失敗就推播」；逐項補腳本後，把對應檢查指令貼給 Cloud Agent。</li>
+                <li>只讀檢查，不修改業務檔、不 commit、不開 PR。Agent 任務失敗後以 Send to Slack 送到指定 channel。</li>
+                <li>實作方式：Cursor Automations 啟用 <strong>Send to Slack</strong> 並指定 channel；逐項補腳本後，把對應檢查指令貼給 Cloud Agent／寫進 Automation Prompt。</li>
             </ul>
         </div>
 
@@ -433,7 +437,7 @@
             <p>在專案根目錄執行：</p>
             <pre class="prompt">node SA/checks/01-sidebar-dead-links.js</pre>
             <p><strong>通過檢核（exit 0）：</strong>為 <code>main.html</code> 每個 <code>data-page</code> 補上對應 HTML 檔（哪怕是空白頁），或拿掉仍指向缺檔的側欄項目。再跑同一指令，stdout 應全是 <code>OK</code>，最後一行 <code>PASS</code>。</p>
-            <p><strong>觸發告警（exit 2）：</strong>維持現況（多數側欄頁不存在），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，手機會收到推播。</p>
+            <p><strong>觸發告警（exit 2）：</strong>維持現況（多數側欄頁不存在），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，Slack channel 應收到告警。</p>
             <p class="expect"><strong>注意：</strong>Cloud Agent 可能從舊的 Build 快照開機，工作區會落後 GitHub。任務裡必須先 <code>git pull</code>。也可到 Dashboard → Environments → Build Settings，開啟 Update stale builds，並把 Staleness threshold 設成 <code>0</code>。</p>
             <pre class="prompt" id="check01AlertPrompt">【專案告警檢查｜01 側欄死連結】
 
@@ -450,11 +454,13 @@
 3. 確認行程結束碼。若不是 0，視為檢查失敗。
 
 4. 不要修復、不要補頁、不要修改任何業務檔案、不要 commit、不要開 pull request。
-   立刻停止。若 exit code 為 2，回覆第一行：
+   立刻停止。若 exit code 為 2：
+   - 若有 Send to Slack：把告警貼到設定的 channel（含情境代碼與 Agent 連結）
+   - 回覆第一行：
 
    【告警】側欄死連結：main.html 指向不存在的頁面
 
-   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_01_SIDEBAR_DEAD_LINKS）。
+   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_01_SIDEBAR_DEAD_LINKS）、是否已送 Slack。
    若是找不到模組（exit 1），先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
             <button class="copy" type="button" onclick="copyCheck01AlertPrompt()">複製 01 告警任務</button>
         </div>
@@ -464,7 +470,7 @@
             <p>在專案根目錄執行：</p>
             <pre class="prompt">node SA/checks/02-login-redirect.js</pre>
             <p><strong>通過檢核（exit 0）：</strong>在 <code>login.html</code> 成功登入分支（帳密皆為 <code>ebiz</code>）加入導向，例如 <code>location.href = 'main.html';</code>。再跑同一指令，stdout 應有 <code>OK</code> 與最後一行 <code>PASS</code>。</p>
-            <p><strong>觸發告警（exit 2）：</strong>維持現況（成功只 <code>alert</code>、未導向），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，手機會收到推播。</p>
+            <p><strong>觸發告警（exit 2）：</strong>維持現況（成功只 <code>alert</code>、未導向），把下面任務貼給 Cloud Agent。Agent 只准跑檢查、不准修檔；失敗後這一輪結束，Slack channel 應收到告警。</p>
             <p class="expect"><strong>注意：</strong>Cloud Agent 可能從舊的 Build 快照開機。任務裡必須先把檢查腳本從 <code>origin/main</code> 取出；或到 Dashboard 把 Staleness threshold 設成 <code>0</code>。</p>
             <pre class="prompt" id="check02AlertPrompt">【專案告警檢查｜02 登入流程斷鏈】
 
@@ -481,11 +487,13 @@
 3. 確認行程結束碼。若不是 0，視為檢查失敗。
 
 4. 不要修復、不要改 login.html、不要修改任何業務檔案、不要 commit、不要開 pull request。
-   立刻停止。若 exit code 為 2，回覆第一行：
+   立刻停止。若 exit code 為 2：
+   - 若有 Send to Slack：把告警貼到設定的 channel（含情境代碼與 Agent 連結）
+   - 回覆第一行：
 
    【告警】登入流程斷鏈：帳密正確後未導向 main.html
 
-   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_02_LOGIN_REDIRECT）。
+   接著只列出：失敗指令、exit code、stderr 原文（含 ALERT_02_LOGIN_REDIRECT）、是否已送 Slack。
    若是找不到模組（exit 1），先回報 git rev-parse HEAD 與 ls SA/checks/ 結果後結束。</pre>
             <button class="copy" type="button" onclick="copyCheck02AlertPrompt()">複製 02 告警任務</button>
         </div>
@@ -666,8 +674,8 @@
             textarea.value = content;
         }
 
-        function showMobileAlertTutorial() {
-            const panel = document.getElementById('mobileAlertTutorial');
+        function showSlackAlertTutorial() {
+            const panel = document.getElementById('slackAlertTutorial');
             const opening = panel.style.display !== 'block';
             panel.style.display = opening ? 'block' : 'none';
             if (opening) {
@@ -697,12 +705,12 @@
             done();
         }
 
-        function copyMobileAlertPrompt() {
-            copyTextFromElement('mobileAlertPrompt', document.querySelector('button[onclick="copyMobileAlertPrompt()"]'));
+        function copySlackAlertPrompt() {
+            copyTextFromElement('slackAlertPrompt', document.querySelector('button[onclick="copySlackAlertPrompt()"]'));
         }
 
-        function copyMobileAlertTimestampPrompt() {
-            copyTextFromElement('mobileAlertTimestampPrompt', document.querySelector('button[onclick="copyMobileAlertTimestampPrompt()"]'));
+        function copySlackAlertTimestampPrompt() {
+            copyTextFromElement('slackAlertTimestampPrompt', document.querySelector('button[onclick="copySlackAlertTimestampPrompt()"]'));
         }
 
         function copyCheck01AlertPrompt() {
