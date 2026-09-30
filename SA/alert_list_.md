@@ -1,4 +1,4 @@
-依目前 ECIF 原型，建議可加的**手機推播告警情境**（Cursor Agent 任務失敗時推播）：
+依目前 ECIF 原型，建議可加的**Slack 頻道告警情境**（Cursor Agent 任務失敗時，由 Automation 以 **Send to Slack** 送到指定 channel）：
 
 | 優先 | 情境 | 觸發條件（範例） | 為什麼值得告警 |
 |---|---|---|---|
@@ -11,6 +11,6 @@
 | 低 | 靜態資源未引用 | `style.css` 未被任何 HTML 引用卻被當成已套用 | 樣式預期與實際不一致 |
 | 低 | Prompt／原型不同步 | `prompts.html` 需求與實際頁面欄位不一致 | AI 再生成時會走偏 |
 
-**實作方式建議：** 在 Cursor Automations 設「Agent 任務失敗就推播」；針對上表各情境，用可驗證的失敗指令或檢查腳本（例如缺檔、斷鏈、預期導向失敗）當觸發，不必等真後端。
+**實作方式建議：** 在 [Cursor Automations](https://cursor.com/automations) 啟用工具 **Send to Slack**，指定告警 channel（例如 `#cursor-alerts`）；針對上表各情境，用可驗證的失敗指令或檢查腳本當觸發，不必等真後端。Agent 失敗結束時，把情境代碼與摘要貼到該 channel。
 
-**手機端顯示驗證（時間戳記）：** 用 `SA/checks/00-mobile-alert-timestamp.js`（每次必失敗、exit 2）。stderr 會輸出 `VERIFY_TOKEN` 與 `TIMESTAMP_TAIPEI`；Agent 回覆第一行寫入同一組時間與代碼後結束這一輪。對照鎖定畫面／通知中心與 Agent 內文，確認是「這一次」推播成功。任務文案見 `prompts.html`「手機告警測試 → 步驟 3B」。
+**Slack 顯示驗證（時間戳記）：** 用 `SA/checks/00-mobile-alert-timestamp.js`（每次必失敗、exit 2）。stderr 會輸出 `VERIFY_TOKEN` 與 `TIMESTAMP_TAIPEI`；Agent 回覆第一行寫入同一組時間與代碼後結束這一輪，並用 Send to Slack 送到指定 channel。對照 Slack 訊息與 Agent 內文，確認是「這一次」告警成功。任務文案見 `prompts.html`「Slack 告警測試 → 步驟 3B」。
